@@ -10,7 +10,6 @@ export class EarthScene {
         this.trees = [];
         this.grassPatches = [];
         this.butterflies = [];
-        this.leaves = [];
         this.clock = new THREE.Clock();
 
         this.setupScene();
@@ -37,13 +36,21 @@ export class EarthScene {
     }
 
     setupScene() {
-        // Ground with animated grass
-        const groundGeometry = new THREE.PlaneGeometry(200, 200, 1, 1);
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambientLight);
+
+        // Add directional light
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        this.scene.add(dirLight);
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(200, 200);
         const groundMaterial = new THREE.MeshPhongMaterial({ 
             color: 0x33aa33,
             shininess: 0
         });
-        
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         this.scene.add(ground);
@@ -61,175 +68,44 @@ export class EarthScene {
         lake.position.set(0, 0.1, 0);
         this.scene.add(lake);
 
-        // Add rowboat
-        this.addRowboat();
-
         // Add houses
         this.addHouses();
 
-        // Add rocks along the river
-        for (let i = 0; i < 20; i++) {
-            const rockGeometry = new THREE.DodecahedronGeometry(Math.random() * 1 + 0.5);
-            const rockMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x808080,
-                shininess: 0
-            });
-            const rock = new THREE.Mesh(rockGeometry, rockMaterial);
-            
-            // Keep rocks away from lake
-            let x, z;
-            do {
-                x = Math.random() * 180 - 90;
-                z = Math.random() * 180 - 90;
-            } while (Math.sqrt(x * x + z * z) < 15); // Keep away from lake
+        // Add UFO
+        this.ufo = this.createUFO();
+        this.ufo.position.set(0, 8, -15); // Center between houses, slightly above them
+        this.scene.add(this.ufo);
 
-            rock.position.set(x, Math.random() * 0.5, z);
-            rock.rotation.set(
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-                Math.random() * Math.PI
-            );
-            this.scene.add(rock);
-        }
+        // Add rowboat
+        this.addRowboat();
 
-        // Add grass patches avoiding lake
-        this.grassPatches = [];
-        for (let i = 0; i < 1000; i++) {
-            let x, z;
-            do {
-                x = Math.random() * 180 - 90;
-                z = Math.random() * 180 - 90;
-            } while (Math.sqrt(x * x + z * z) < 15); // Keep away from lake
+        // Add trees
+        this.addTrees();
 
-            const grassGeometry = new THREE.PlaneGeometry(0.4, 1.5);
-            const grassMaterial = new THREE.MeshPhongMaterial({ 
-                color: new THREE.Color(0x33aa33).offsetHSL(0, 0, (Math.random() - 0.5) * 0.2),
-                side: THREE.DoubleSide,
-                transparent: true
-            });
-            const grass = new THREE.Mesh(grassGeometry, grassMaterial);
-            grass.position.set(x, 0.75, z);
-            grass.initialRotation = Math.random() * Math.PI;
-            grass.rotation.y = grass.initialRotation;
-            grass.swaySpeed = Math.random() * 2 + 1;
-            grass.swayOffset = Math.random() * Math.PI * 2;
-            
-            this.grassPatches.push(grass);
-            this.scene.add(grass);
-        }
-
-        // Add trees avoiding lake, houses, and rocks
-        this.trees = [];
-        const treePositions = [];
-        const housePositions = [
-            { x: -15, z: -15, radius: 8 },  // Left house
-            { x: 15, z: -15, radius: 8 }    // Right house
-        ];
-        
-        // Helper function to check if position is valid
-        const isValidPosition = (x, z, radius) => {
-            // Check lake distance (15 units radius)
-            if (Math.sqrt(x * x + z * z) < 15) return false;
-            
-            // Check house distances
-            for (const house of housePositions) {
-                const dx = x - house.x;
-                const dz = z - house.z;
-                if (Math.sqrt(dx * dx + dz * dz) < house.radius) return false;
-            }
-            
-            // Check other trees
-            for (const pos of treePositions) {
-                const dx = x - pos.x;
-                const dz = z - pos.z;
-                if (Math.sqrt(dx * dx + dz * dz) < 4) return false;  // Minimum 4 units between trees
-            }
-            
-            return true;
-        };
-
-        // Try to place 80 trees
-        const maxAttempts = 1000;
-        let attempts = 0;
-        while (treePositions.length < 80 && attempts < maxAttempts) {
-            attempts++;
-            
-            // Generate position in a larger area
-            const x = Math.random() * 180 - 90;
-            const z = Math.random() * 180 - 90;
-            
-            if (isValidPosition(x, z)) {
-                treePositions.push({ x, z });
-                const tree = this.createTree();
-                tree.position.set(x, 0, z);
-                tree.rotation.y = Math.random() * Math.PI * 2;
-                
-                // Randomize tree scale slightly
-                const scale = 0.8 + Math.random() * 0.4;  // Scale between 0.8 and 1.2
-                tree.scale.set(scale, scale, scale);
-                
-                this.trees.push(tree);
-                this.scene.add(tree);
-            }
-        }
+        // Add grass patches
+        this.addGrassPatches();
 
         // Add butterflies
-        this.butterflies = [];
-        for (let i = 0; i < 30; i++) {
-            const butterfly = this.createButterfly();
-            const radius = Math.random() * 30 + 10;
-            const angle = Math.random() * Math.PI * 2;
-            const height = Math.random() * 10 + 5;
-            
-            butterfly.position.set(
-                Math.cos(angle) * radius,
-                height,
-                Math.sin(angle) * radius
-            );
-            butterfly.speed = Math.random() * 0.5 + 0.5;
-            butterfly.radius = radius;
-            butterfly.angle = angle;
-            butterfly.height = height;
-            butterfly.verticalSpeed = Math.random() * 2 + 1;
-            butterfly.verticalOffset = Math.random() * Math.PI * 2;
-            
-            this.butterflies.push(butterfly);
-            this.scene.add(butterfly);
-        }
+        this.addButterflies();
 
-        // Add floating leaves
-        this.leaves = [];
-        for (let i = 0; i < 50; i++) {
-            const leaf = this.createLeaf();
-            const radius = Math.random() * 40 + 5;
-            const angle = Math.random() * Math.PI * 2;
-            const height = Math.random() * 15 + 2;
-            
-            leaf.position.set(
-                Math.cos(angle) * radius,
-                height,
-                Math.sin(angle) * radius
-            );
-            
-            leaf.radius = radius;
-            leaf.angle = angle;
-            leaf.height = height;
-            leaf.originalHeight = height;
-            leaf.rotationSpeed = Math.random() * 0.02 - 0.01;
-            leaf.fallSpeed = Math.random() * 0.2 + 0.1;
-            leaf.horizontalSpeed = Math.random() * 0.5 + 0.5;
-            
-            this.leaves.push(leaf);
-            this.scene.add(leaf);
-        }
+        // Add click interaction for UFO
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-        // Dynamic lighting
-        this.ambientLight = new THREE.AmbientLight(0x404040, 1.5);
-        this.scene.add(this.ambientLight);
+        window.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        this.sunLight = new THREE.DirectionalLight(0xffffff, 1);
-        this.sunLight.position.set(1, 1, 1);
-        this.scene.add(this.sunLight);
+            raycaster.setFromCamera(mouse, this.camera);
+            const intersects = raycaster.intersectObject(this.ufo, true);
+
+            if (intersects.length > 0) {
+                const ufoData = this.ufo.userData;
+                ufoData.isBouncing = true;
+                ufoData.bounceStartTime = this.clock.getElapsedTime();
+                ufoData.bounceHeight = 5; // Height of bounce
+            }
+        });
     }
 
     addRowboat() {
@@ -556,144 +432,324 @@ export class EarthScene {
         return butterfly;
     }
 
-    createLeaf() {
-        const leafGeometry = new THREE.BufferGeometry();
-        const leafShape = new THREE.Shape();
-        
-        leafShape.moveTo(0, 0);
-        leafShape.quadraticCurveTo(0.5, 0.5, 1, 0);
-        leafShape.quadraticCurveTo(0.5, -0.2, 0, 0);
-        
-        const points = leafShape.getPoints(20);
-        const vertices = new Float32Array(points.length * 3);
-        
-        points.forEach((point, i) => {
-            vertices[i * 3] = point.x;
-            vertices[i * 3 + 1] = point.y;
-            vertices[i * 3 + 2] = 0;
+    createUFO() {
+        const ufoGroup = new THREE.Group();
+
+        // Create the main saucer body
+        const bodyGeometry = new THREE.SphereGeometry(2, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.3);
+        const bodyMaterial = new THREE.MeshPhongMaterial({
+            color: 0x444444,
+            shininess: 100,
+            emissive: 0x222222
         });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.scale.y = 0.5;
+        ufoGroup.add(body);
+
+        // Add rim details
+        const rimGeometry = new THREE.TorusGeometry(2, 0.2, 16, 32);
+        const rimMaterial = new THREE.MeshPhongMaterial({
+            color: 0x666666,
+            shininess: 100
+        });
+        const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+        rim.rotation.x = Math.PI / 2;
+        ufoGroup.add(rim);
+
+        // Add panel details around the rim
+        const panelCount = 12;
+        for (let i = 0; i < panelCount; i++) {
+            const angle = (i / panelCount) * Math.PI * 2;
+            const panelGeometry = new THREE.BoxGeometry(0.4, 0.1, 0.2);
+            const panelMaterial = new THREE.MeshPhongMaterial({
+                color: 0x333333,
+                shininess: 80
+            });
+            const panel = new THREE.Mesh(panelGeometry, panelMaterial);
+            panel.position.set(
+                Math.cos(angle) * 2,
+                0,
+                Math.sin(angle) * 2
+            );
+            panel.rotation.y = angle;
+            ufoGroup.add(panel);
+        }
+
+        // Create the dome with internal details
+        const domeGroup = new THREE.Group();
         
-        leafGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        
-        const leafMaterial = new THREE.MeshPhongMaterial({
-            color: new THREE.Color(0x228B22).offsetHSL(0, 0, (Math.random() - 0.5) * 0.2),
-            side: THREE.DoubleSide,
+        // Outer dome
+        const domeGeometry = new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        const domeMaterial = new THREE.MeshPhongMaterial({
+            color: 0x88ccff,
             transparent: true,
-            opacity: 0.9
+            opacity: 0.6,
+            shininess: 100
         });
-        
-        return new THREE.Mesh(leafGeometry, leafMaterial);
+        const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+        domeGroup.add(dome);
+
+        // Inner dome structure
+        const innerDomeGeometry = new THREE.SphereGeometry(0.8, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        const innerDomeMaterial = new THREE.MeshPhongMaterial({
+            color: 0x444444,
+            shininess: 100,
+            wireframe: true
+        });
+        const innerDome = new THREE.Mesh(innerDomeGeometry, innerDomeMaterial);
+        domeGroup.add(innerDome);
+
+        // Add mysterious floating core
+        const coreGeometry = new THREE.OctahedronGeometry(0.3);
+        const coreMaterial = new THREE.MeshPhongMaterial({
+            color: 0xff8800,
+            emissive: 0xff4400,
+            emissiveIntensity: 0.5,
+            shininess: 100
+        });
+        const core = new THREE.Mesh(coreGeometry, coreMaterial);
+        core.position.y = 0.3;
+        domeGroup.add(core);
+
+        domeGroup.position.y = 0.5;
+        ufoGroup.add(domeGroup);
+
+        // Add running lights
+        const lightCount = 8;
+        for (let i = 0; i < lightCount; i++) {
+            const angle = (i / lightCount) * Math.PI * 2;
+            const light = new THREE.PointLight(0x00ffff, 1, 5);
+            light.position.set(
+                Math.cos(angle) * 1.8,
+                0,
+                Math.sin(angle) * 1.8
+            );
+            ufoGroup.add(light);
+
+            // Add visible light sphere with glow
+            const lightSphereGeometry = new THREE.SphereGeometry(0.15, 8, 8);
+            const lightSphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.8
+            });
+            const lightSphere = new THREE.Mesh(lightSphereGeometry, lightSphereMaterial);
+            lightSphere.position.copy(light.position);
+            ufoGroup.add(lightSphere);
+
+            // Add glow ring around each light
+            const glowGeometry = new THREE.RingGeometry(0.2, 0.3, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.4,
+                side: THREE.DoubleSide
+            });
+            const glowRing = new THREE.Mesh(glowGeometry, glowMaterial);
+            glowRing.position.copy(light.position);
+            glowRing.lookAt(new THREE.Vector3(0, 0, 0));
+            ufoGroup.add(glowRing);
+        }
+
+        // Add spotlight beneath
+        const spotLight = new THREE.SpotLight(0x88ccff, 2, 50, Math.PI / 6, 0.5, 1);
+        spotLight.position.set(0, -0.5, 0);
+        spotLight.target.position.set(0, -10, 0);
+        ufoGroup.add(spotLight);
+        ufoGroup.add(spotLight.target);
+
+        // Add movement and rotation properties
+        ufoGroup.userData = {
+            time: 0,
+            baseHeight: 8,
+            heightRange: 2,       // Increased bounce height
+            rotationSpeedY: 0.03, // Single axis rotation
+            bounceSpeed: 0.003,   // Speed of bouncing
+            hoverRadius: 1,       // Reduced hover radius for more stable position
+            hoverSpeed: 0.0005,
+            isBouncing: false,
+            bounceStartTime: 0,
+            bounceDuration: 1.0
+        };
+
+        return ufoGroup;
     }
 
-    animate(time) {
-        time *= 0.001; // Convert to seconds
-        
-        // Update tree sway
-        this.trees.forEach(tree => {
-            if (!tree || !tree.rotation) return;
-            const sway = Math.sin(time * 0.5) * 0.05;
-            tree.rotation.z = sway;
+    addGrassPatches() {
+        // Add grass patches avoiding lake
+        this.grassPatches = [];
+        for (let i = 0; i < 1000; i++) {
+            let x, z;
+            do {
+                x = Math.random() * 180 - 90;
+                z = Math.random() * 180 - 90;
+            } while (Math.sqrt(x * x + z * z) < 15); // Keep away from lake
+
+            const grassGeometry = new THREE.PlaneGeometry(0.4, 1.5);
+            const grassMaterial = new THREE.MeshPhongMaterial({ 
+                color: new THREE.Color(0x33aa33).offsetHSL(0, 0, (Math.random() - 0.5) * 0.2),
+                side: THREE.DoubleSide,
+                transparent: true
+            });
+            const grass = new THREE.Mesh(grassGeometry, grassMaterial);
+            grass.position.set(x, 0.75, z);
+            grass.initialRotation = Math.random() * Math.PI;
+            grass.rotation.y = grass.initialRotation;
+            grass.swaySpeed = Math.random() * 2 + 1;
+            grass.swayOffset = Math.random() * Math.PI * 2;
+            grass.swayAmount = Math.random() * 0.3 + 0.1; // Random sway amount
             
-            // Also sway leaves
-            if (tree.children) {
-                tree.children.forEach((child, index) => {
-                    if (index > 0 && child && child.rotation) { // Skip trunk
-                        child.rotation.z = sway * (index * 0.5);
-                    }
-                });
-            }
-        });
-        
-        // Update grass sway
-        this.grassPatches.forEach(grass => {
-            if (!grass || !grass.rotation) return;
-            const sway = Math.sin(time * grass.swaySpeed + grass.swayOffset) * 0.2;
-            grass.rotation.y = grass.initialRotation + sway;
-        });
-        
-        // Update butterfly movement
-        this.butterflies.forEach(butterfly => {
-            if (!butterfly || !butterfly.position || !butterfly.rotation) return;
-            butterfly.angle += butterfly.speed * 0.02;
-            const verticalMovement = Math.sin(time * butterfly.verticalSpeed + butterfly.verticalOffset) * 0.5;
-            
-            butterfly.position.x = Math.cos(butterfly.angle) * butterfly.radius;
-            butterfly.position.y = butterfly.height + verticalMovement;
-            butterfly.position.z = Math.sin(butterfly.angle) * butterfly.radius;
-            
-            // Rotate wings
-            if (butterfly.children && butterfly.children.length >= 2) {
-                if (butterfly.children[0] && butterfly.children[0].rotation) {
-                    butterfly.children[0].rotation.y = Math.sin(time * 15) * 0.5;
-                }
-                if (butterfly.children[1] && butterfly.children[1].rotation) {
-                    butterfly.children[1].rotation.y = -Math.sin(time * 15) * 0.5;
-                }
-            }
-            
-            // Orient butterfly in direction of movement
-            butterfly.rotation.y = -butterfly.angle + Math.PI / 2;
-        });
-        
-        // Update floating leaves
-        this.leaves.forEach(leaf => {
-            if (!leaf || !leaf.position || !leaf.rotation) return;
-            leaf.angle += leaf.horizontalSpeed * 0.02;
-            leaf.height -= leaf.fallSpeed;
-            
-            // Reset leaf when it falls too low
-            if (leaf.height < 0) {
-                leaf.height = leaf.originalHeight;
-                leaf.angle = Math.random() * Math.PI * 2;
-            }
-            
-            leaf.position.x = Math.cos(leaf.angle) * leaf.radius;
-            leaf.position.y = leaf.height;
-            leaf.position.z = Math.sin(leaf.angle) * leaf.radius;
-            
-            // Rotate leaf while falling
-            leaf.rotation.x += leaf.rotationSpeed;
-            leaf.rotation.y += leaf.rotationSpeed * 0.7;
-        });
+            this.grassPatches.push(grass);
+            this.scene.add(grass);
+        }
     }
 
-    activate() {
-        // Any activation logic
+    addTrees() {
+        // Add trees avoiding lake, houses, and rocks
+        this.trees = [];
+        const treePositions = [];
+        const housePositions = [
+            { x: -15, z: -15, radius: 8 },  // Left house
+            { x: 15, z: -15, radius: 8 }    // Right house
+        ];
+        
+        // Helper function to check if position is valid
+        const isValidPosition = (x, z, radius) => {
+            // Check lake distance (15 units radius)
+            if (Math.sqrt(x * x + z * z) < 15) return false;
+            
+            // Check house distances
+            for (const house of housePositions) {
+                const dx = x - house.x;
+                const dz = z - house.z;
+                if (Math.sqrt(dx * dx + dz * dz) < house.radius) return false;
+            }
+            
+            // Check other trees
+            for (const pos of treePositions) {
+                const dx = x - pos.x;
+                const dz = z - pos.z;
+                if (Math.sqrt(dx * dx + dz * dz) < 4) return false;  // Minimum 4 units between trees
+            }
+            
+            return true;
+        };
+
+        // Try to place 80 trees
+        const maxAttempts = 1000;
+        let attempts = 0;
+        while (treePositions.length < 80 && attempts < maxAttempts) {
+            attempts++;
+            
+            // Generate position in a larger area
+            const x = Math.random() * 180 - 90;
+            const z = Math.random() * 180 - 90;
+            
+            if (isValidPosition(x, z)) {
+                treePositions.push({ x, z });
+                const tree = this.createTree();
+                tree.position.set(x, 0, z);
+                tree.rotation.y = Math.random() * Math.PI * 2;
+                tree.swaySpeed = Math.random() * 0.5 + 0.5; // Random sway speed
+                tree.swayAmount = Math.random() * 0.05 + 0.02; // Random sway amount
+                
+                // Randomize tree scale slightly
+                const scale = 0.8 + Math.random() * 0.4;  // Scale between 0.8 and 1.2
+                tree.scale.set(scale, scale, scale);
+                
+                this.trees.push(tree);
+                this.scene.add(tree);
+            }
+        }
     }
 
-    deactivate() {
-        // Any cleanup logic
+    addButterflies() {
+        // Add butterflies
+        this.butterflies = [];
+        for (let i = 0; i < 30; i++) {
+            const butterfly = this.createButterfly();
+            const radius = Math.random() * 30 + 10;
+            const angle = Math.random() * Math.PI * 2;
+            const height = Math.random() * 10 + 5;
+            
+            butterfly.position.set(
+                Math.cos(angle) * radius,
+                height,
+                Math.sin(angle) * radius
+            );
+            butterfly.speed = Math.random() * 0.5 + 0.5;
+            butterfly.radius = radius;
+            butterfly.angle = angle;
+            butterfly.height = height;
+            butterfly.verticalSpeed = Math.random() * 2 + 1;
+            butterfly.verticalOffset = Math.random() * Math.PI * 2;
+            
+            this.butterflies.push(butterfly);
+            this.scene.add(butterfly);
+        }
     }
 
     update() {
         const time = this.clock.getElapsedTime();
         
-        // Update tree sway
-        this.trees.forEach(tree => {
-            if (!tree || !tree.rotation) return;
-            const sway = Math.sin(time * 0.5) * 0.05;
-            tree.rotation.z = sway;
+        // Update UFO animation
+        if (this.ufo) {
+            const ufoData = this.ufo.userData;
             
-            // Also sway leaves
-            if (tree.children) {
-                tree.children.forEach((child, index) => {
-                    if (index > 0 && child && child.rotation) { // Skip trunk
-                        child.rotation.z = sway * (index * 0.5);
-                    }
-                });
+            // Simple Y-axis rotation only
+            this.ufo.rotation.y += ufoData.rotationSpeedY;
+
+            // Handle special bounce animation when clicked
+            if (ufoData.isBouncing) {
+                const bounceTime = time - ufoData.bounceStartTime;
+                if (bounceTime <= ufoData.bounceDuration) {
+                    // Create a more dramatic bounce using sine
+                    const bounceProgress = bounceTime / ufoData.bounceDuration;
+                    const bounceHeight = ufoData.bounceHeight * Math.sin(bounceProgress * Math.PI);
+                    this.ufo.position.y = ufoData.baseHeight + bounceHeight;
+                } else {
+                    // Reset bounce state
+                    ufoData.isBouncing = false;
+                }
+            } else {
+                // Regular hovering motion
+                this.ufo.position.y = ufoData.baseHeight + 
+                    Math.sin(time * ufoData.bounceSpeed) * ufoData.heightRange;
             }
-        });
+
+            // Minimal horizontal movement
+            const hoverAngle = time * ufoData.hoverSpeed;
+            this.ufo.position.x = Math.cos(hoverAngle) * ufoData.hoverRadius;
+            this.ufo.position.z = -15 + Math.sin(hoverAngle) * (ufoData.hoverRadius * 0.5);
+
+            // Update light intensities during bounce
+            this.ufo.children.forEach(child => {
+                if (child.isPointLight) {
+                    child.intensity = ufoData.isBouncing ? 2 : 1;
+                } else if (child.material && child.material.transparent) {
+                    child.material.opacity = ufoData.isBouncing ? 0.6 : 0.4;
+                }
+            });
+
+            // Update spotlight
+            const spotLight = this.ufo.children.find(child => child.isSpotLight);
+            if (spotLight) {
+                spotLight.target.position.y = this.ufo.position.y - 10;
+                spotLight.intensity = ufoData.isBouncing ? 3 : 2;
+            }
+        }
         
-        // Update grass sway
+        // Update grass sway with more natural movement
         this.grassPatches.forEach(grass => {
-            if (!grass || !grass.rotation) return;
-            const sway = Math.sin(time * 0.5 + grass.position.x * 0.1) * 0.2;
-            grass.rotation.y = sway;
+            const swayX = Math.sin(time * grass.swaySpeed + grass.swayOffset);
+            const swayZ = Math.cos(time * grass.swaySpeed * 0.7 + grass.swayOffset);
+            grass.rotation.x = swayX * 0.1; // Slight forward/backward sway
+            grass.rotation.y = grass.initialRotation + swayZ * grass.swayAmount; // Side-to-side sway
+            grass.rotation.z = swayX * 0.05; // Slight twist
         });
         
         // Update butterfly movement
         this.butterflies.forEach(butterfly => {
-            if (!butterfly || !butterfly.position || !butterfly.rotation) return;
             butterfly.angle += 0.02;
             const verticalMovement = Math.sin(time * 2) * 0.5;
             
@@ -703,56 +759,60 @@ export class EarthScene {
             
             // Wing flapping
             if (butterfly.children && butterfly.children.length >= 2) {
-                if (butterfly.children[0] && butterfly.children[0].rotation) {
-                    butterfly.children[0].rotation.z = Math.sin(time * 15) * 0.5;
-                }
-                if (butterfly.children[1] && butterfly.children[1].rotation) {
-                    butterfly.children[1].rotation.z = -Math.sin(time * 15) * 0.5;
-                }
+                butterfly.children[0].rotation.z = Math.sin(time * 15) * 0.5;
+                butterfly.children[1].rotation.z = -Math.sin(time * 15) * 0.5;
             }
             
-            // Rotate to face movement direction
             butterfly.rotation.y = butterfly.angle + Math.PI / 2;
         });
-        
-        // Update floating leaves
-        this.leaves.forEach(leaf => {
-            if (!leaf || !leaf.position || !leaf.rotation) return;
-            leaf.angle += 0.02;
-            leaf.height -= 0.1;
-            
-            // Reset leaf when it falls too low
-            if (leaf.height < 0) {
-                leaf.height = leaf.originalHeight;
-                leaf.angle = Math.random() * Math.PI * 2;
+
+        // Update tree sway with more natural movement
+        this.trees.forEach(tree => {
+            if (tree && tree.rotation) {
+                const swayX = Math.sin(time * tree.swaySpeed + tree.position.x * 0.1);
+                const swayZ = Math.cos(time * tree.swaySpeed * 0.7 + tree.position.z * 0.1);
+                tree.rotation.x = swayX * tree.swayAmount * 0.5; // Slight forward/backward sway
+                tree.rotation.z = swayZ * tree.swayAmount; // Main side-to-side sway
+                
+                // Also sway branches if they exist
+                if (tree.children) {
+                    tree.children.forEach((branch, index) => {
+                        if (index > 0 && branch.rotation) { // Skip trunk (index 0)
+                            branch.rotation.x = swayX * tree.swayAmount * 0.7 * index;
+                            branch.rotation.z = swayZ * tree.swayAmount * 1.2 * index;
+                        }
+                    });
+                }
             }
-            
-            leaf.position.x = Math.cos(leaf.angle) * leaf.radius;
-            leaf.position.y = leaf.height;
-            leaf.position.z = Math.sin(leaf.angle) * leaf.radius;
-            
-            // Rotate leaf while falling
-            leaf.rotation.x += 0.01;
-            leaf.rotation.y += 0.01 * 0.7;
         });
+    }
+
+    dispose() {
+        // Remove event listeners
+        window.removeEventListener('click', this.onUFOClick);
         
-        // Update lighting for day/night cycle
-        const dayLength = 60; // 60 seconds per day
-        const dayTime = (time % dayLength) / dayLength;
-        const sunAngle = dayTime * Math.PI * 2;
+        // Dispose of geometries and materials
+        this.scene.traverse(object => {
+            if (object.geometry) {
+                object.geometry.dispose();
+            }
+            if (object.material) {
+                if (Array.isArray(object.material)) {
+                    object.material.forEach(material => material.dispose());
+                } else {
+                    object.material.dispose();
+                }
+            }
+        });
+
+        // Clear arrays
+        this.trees = [];
+        this.grassPatches = [];
+        this.butterflies = [];
         
-        this.sunLight.position.x = Math.cos(sunAngle) * 50;
-        this.sunLight.position.y = Math.sin(sunAngle) * 50;
-        
-        // Adjust light intensity based on time of day
-        const intensity = Math.max(0.2, Math.sin(sunAngle));
-        this.sunLight.intensity = intensity * 2;
-        this.ambientLight.intensity = 0.5 + intensity;
-        
-        // Adjust scene colors for dawn/dusk
-        if (sunAngle < Math.PI) {
-            this.scene.background.setHSL(0.2, 0.5, 0.4 + intensity * 0.2);
-            this.scene.fog.color.copy(this.scene.background);
+        // Clear scene
+        while(this.scene.children.length > 0) { 
+            this.scene.remove(this.scene.children[0]); 
         }
     }
 }

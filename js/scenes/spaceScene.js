@@ -45,62 +45,86 @@ export class SpaceScene {
         this.scene.add(pointLight);
 
         // Create stars with varying sizes and colors
-        const starColors = [0xffffff, 0xffffee, 0xeeeeff];
-        const starSizes = [0.3, 0.2, 0.1];
-        
-        for (let i = 0; i < 3000; i++) {
-            const geometry = new THREE.SphereGeometry(starSizes[i % starSizes.length], 8, 8);
-            const material = new THREE.MeshBasicMaterial({
-                color: starColors[i % starColors.length],
-                transparent: true,
-                opacity: Math.random() * 0.5 + 0.5
-            });
-            
-            const star = new THREE.Mesh(geometry, material);
-            const radius = Math.random() * 150 + 50;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.random() * Math.PI * 2;
-            
-            star.position.x = radius * Math.sin(phi) * Math.cos(theta);
-            star.position.y = radius * Math.sin(phi) * Math.sin(theta);
-            star.position.z = radius * Math.cos(phi);
-            
-            star.userData = {
-                baseOpacity: material.opacity,
-                twinkleSpeed: Math.random() * 0.1 + 0.05,
-                twinklePhase: Math.random() * Math.PI * 2
-            };
-            
-            this.stars.push(star);
-            this.scene.add(star);
+        const starGeometry = new THREE.BufferGeometry();
+        const starMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true
+        });
+
+        const starVertices = [];
+        const starColors = [];
+        const radius = 1000;
+
+        for (let i = 0; i < 20000; i++) {
+            const theta = 2 * Math.PI * Math.random();
+            const phi = Math.acos(2 * Math.random() - 1);
+            const distance = Math.random() * radius;
+
+            const x = distance * Math.sin(phi) * Math.cos(theta);
+            const y = distance * Math.sin(phi) * Math.sin(theta);
+            const z = distance * Math.cos(phi);
+
+            starVertices.push(x, y, z);
+
+            // Random star color (white to blue-ish)
+            const r = Math.random() * 0.3 + 0.7;
+            const g = Math.random() * 0.3 + 0.7;
+            const b = Math.random() * 0.2 + 0.8;
+            starColors.push(r, g, b);
         }
 
-        // Create sun with enhanced glow
-        const sunGeometry = new THREE.SphereGeometry(8, 64, 64);
-        const sunMaterial = new THREE.MeshBasicMaterial({
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        this.scene.add(stars);
+        this.stars = stars;
+
+        // Create sun
+        const sunGeometry = new THREE.SphereGeometry(5, 32, 32);
+        const sunMaterial = new THREE.MeshPhongMaterial({
             color: 0xffff00,
+            emissive: 0xffff00,
+            emissiveIntensity: 1,
+            shininess: 0
+        });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        this.scene.add(sun);
+
+        // Create sun glow
+        const sunGlowGeometry = new THREE.SphereGeometry(6, 32, 32);
+        const sunGlowMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    gl_FragColor = vec4(1.0, 0.8, 0.0, intensity * (0.8 + 0.2 * sin(time * 2.0)));
+                }
+            `,
             transparent: true,
-            opacity: 0.9
+            side: THREE.BackSide
         });
-        this.sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+        this.sunGlow = sunGlow;
+        this.scene.add(sunGlow);
 
-        // Add multiple layers of sun glow
-        const glowColors = [0xffff00, 0xff8800, 0xff4400];
-        const glowSizes = [8.5, 9, 9.5];
-        glowColors.forEach((color, i) => {
-            const glowGeometry = new THREE.SphereGeometry(glowSizes[i], 32, 32);
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.15 - (i * 0.03),
-                side: THREE.BackSide
-            });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-            this.sun.add(glow);
-        });
-        this.scene.add(this.sun);
+        // Create planets
+        this.createPlanets();
+    }
 
-        // Create planets with real solar system properties
+    createPlanets() {
         const planetConfigs = [
             {
                 name: 'Mercury',
@@ -315,27 +339,30 @@ export class SpaceScene {
     update() {
         const time = this.clock.getElapsedTime();
 
-        // Update star twinkle
-        this.stars.forEach(star => {
-            const twinkle = Math.sin(time * star.userData.twinkleSpeed + star.userData.twinklePhase);
-            star.material.opacity = star.userData.baseOpacity * (0.7 + 0.3 * twinkle);
-        });
+        // Update sun glow
+        if (this.sunGlow) {
+            this.sunGlow.material.uniforms.time.value = time;
+        }
 
-        // Update planets
-        this.planets.forEach(planet => {
-            // Orbit movement
-            const angle = time * planet.userData.orbitSpeed;
-            planet.position.x = Math.cos(angle) * planet.userData.orbitRadius;
-            planet.position.z = Math.sin(angle) * planet.userData.orbitRadius;
+        // Rotate stars slowly
+        if (this.stars) {
+            this.stars.rotation.y = time * 0.02;
+        }
+
+        // Update planet rotations
+        this.planets.forEach((planet, index) => {
+            const speed = 0.2 / (index + 1);
+            const radius = 20 + index * 15;
             
-            // Planet rotation
-            planet.rotation.y += planet.userData.rotationSpeed;
-        });
+            planet.position.x = Math.cos(time * speed) * radius;
+            planet.position.z = Math.sin(time * speed) * radius;
+            planet.rotation.y += 0.01 / (index + 1);
 
-        // Subtle sun pulsing and rotation
-        const sunScale = 1 + Math.sin(time * 0.5) * 0.02;
-        this.sun.scale.set(sunScale, sunScale, sunScale);
-        this.sun.rotation.y += 0.001;
+            if (planet.ring) {
+                planet.ring.position.copy(planet.position);
+                planet.ring.rotation.z = Math.PI / 3;
+            }
+        });
     }
 
     activate() {
