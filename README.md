@@ -1,6 +1,6 @@
 # Interactive 3D Bio
 
-An immersive 3D Bio featuring two dynamic scenes: a serene countryside environment and an interactive solar system. Built with Three.js, this project showcases both natural beauty and astronomical accuracy.
+An immersive 3D bio featuring two dynamic scenes: a serene countryside environment and an interactive solar system. Built with Three.js, this project showcases both natural beauty and astronomical accuracy.
 
 ## Features
 
