@@ -1,0 +1,16 @@
+{
+    "scenes": [
+        {
+            "id": "space",
+            "name": "Solar System",
+            "file": "spaceScene.js",
+            "description": "Interactive solar system with orbiting planets"
+        },
+        {
+            "id": "jungle",
+            "name": "Jungle World",
+            "file": "jungleScene.js",
+            "description": "Peaceful jungle scene with trees"
+        }
+    ]
+}

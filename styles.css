@@ -1,0 +1,509 @@
+body {
+    margin: 0; 
+    font-family: 'Space Mono', monospace;
+    color: white;
+    overflow: hidden;
+    background: #000;
+    line-height: 1.6;
+}
+
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1; 
+    background-image: url('space-wallpaper.jpg'); 
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+    position: relative; 
+    z-index: 75; 
+    background: rgba(255, 255, 255, 0.8); 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.photo img {
+    width: 100%;
+    height: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+#links-container {
+    position: fixed;
+    top: calc(40% + 200px);
+    left: 2rem;
+    z-index: 1000;
+}
+
+.social-links {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+    border-radius: 15px;
+    width: 30vw;
+    min-width: 300px;
+    max-width: 400px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.astronaut-link {
+    position: relative;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.astronaut-link:hover {
+    background: rgba(85, 107, 47, 0.3);
+    transform: translateY(-2px);
+}
+
+.astronaut-link span {
+    color: white;
+    font-size: 0.8rem;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.astronaut {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border: 2px solid #556B2F;
+    transition: all 0.3s ease;
+}
+
+.astronaut-link:hover .astronaut {
+    border-color: white;
+    transform: scale(1.1);
+}
+
+canvas { 
+    display: block !important; 
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 2 !important; 
+    opacity: 0.8 !important;
+    pointer-events: auto !important; 
+    touch-action: none !important; 
+}
+
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#autobiography {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    transform: none;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1.5rem;
+    border-radius: 15px;
+    width: 30vw;
+    height: auto;
+    min-width: 300px;
+    max-width: 400px;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: white;
+    font-size: 1rem;
+    line-height: 1.4;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+    opacity: 1;
+    visibility: visible;
+}
+
+.highlight {
+    color: #ffff00;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.highlight-red {
+    color: #FF0000;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.7),
+                 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.highlight-green {
+    color: #00FF00;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.7),
+                 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.highlight-engineer {
+    color: #0080FF;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 128, 255, 0.7),
+                 0 0 20px rgba(0, 128, 255, 0.5);
+}
+
+.highlight-css,
+.highlight-html,
+.highlight-javascript,
+.highlight-python,
+.highlight-rust {
+    color: #0080FF;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 128, 255, 0.7),
+                 0 0 20px rgba(0, 128, 255, 0.5);
+}
+
+.bio {
+    margin-bottom: 1rem;
+}
+
+.bio p {
+    margin-bottom: 0.8rem;
+    color: white;
+    font-size: 1rem;
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    color: #FFD700;
+    text-align: center;
+}
+
+.social-links {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.social-links a {
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 0.4rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.social-links a.red-link {
+    color: #FF3333;
+}
+
+.social-links a:hover {
+    color: white;
+}
+
+/* Mobile Menu Styles */
+.menu-button {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.menu-button span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    margin: 6px 0;
+    transition: 0.4s;
+}
+
+.menu-button.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(-6px, 6px);
+}
+
+.menu-button.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-button.active span:nth-child(3) {
+    transform: rotate(45deg) translate(-6px, -6px);
+}
+
+.content-wrapper {
+    transition: transform 0.4s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Menu Button Styles */
+    .menu-button {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001 !important; 
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    .menu-button span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: white;
+        margin: 6px 0;
+        transition: 0.4s;
+    }
+
+    .menu-button.active span:nth-child(1) {
+        transform: rotate(-45deg) translate(-6px, 6px);
+    }
+
+    .menu-button.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-button.active span:nth-child(3) {
+        transform: rotate(45deg) translate(-6px, -6px);
+    }
+
+    /* Content Styles */
+    #autobiography {
+        position: fixed !important;
+        top: 70px !important;
+        left: 50% !important;
+        transform: translate(-50%, 0) scale(0.95) !important;
+        width: 90% !important;
+        min-width: unset !important;
+        max-width: 320px !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: all 0.3s ease-in-out !important;
+        z-index: 1000 !important; 
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        pointer-events: none !important; 
+    }
+
+    #autobiography.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translate(-50%, 0) scale(1) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Menu button should always be interactive */
+    .menu-button {
+        pointer-events: auto !important;
+        z-index: 1001 !important; 
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow: hidden !important;
+        touch-action: none !important; 
+    }
+
+    #autobiography {
+        position: fixed;
+        top: 45vh; 
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        width: 92vw;
+        min-width: unset;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        padding: 1.25rem;
+        font-size: 1rem;
+        bottom: 2rem !important;
+        max-width: none;
+    }
+    
+    .bio p {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .social-links {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+    
+    .social-links a {
+        font-size: 0.9rem;
+        padding: 0.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #autobiography {
+        width: 94vw;
+        padding: 1rem;
+        bottom: 1rem !important;
+    }
+    
+    .bio p {
+        font-size: 0.95rem;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .social-links {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .social-links a {
+        font-size: 0.85rem;
+        padding: 0.25rem;
+    }
+}
+
+/* Scene controls positioning for mobile */
+@media (max-width: 768px) {
+    #controls {
+        top: 20px;
+        right: 20px;
+        left: auto;
+        transform: none;
+    }
+}
+
+/* Additional mobile optimization for very small screens */
+@media (max-width: 360px) {
+    #autobiography {
+        top: 60px !important;
+        width: 95% !important;
+        padding: 15px !important;
+        max-width: 300px !important;
+    }
+
+    #autobiography h1 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .bio {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .bio p {
+        font-size: 12px;
+        line-height: 1.3;
+        margin-bottom: 10px;
+    }
+
+    .social-links a {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+}
+
+/* Selection styles */
+::selection {
+    background-color: #556B2F !important;
+    color: white !important;
+}
+
+::-moz-selection {
+    background-color: #556B2F !important;
+    color: white !important;
+}
+
+::-webkit-selection {
+    background-color: #556B2F !important;
+    color: white !important;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "ghost-rayu-portfolio",
+  "version": "1.0.0",
+  "description": "Ghost Rayu's Interactive 3D Portfolio",
+  "main": "js/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "http-server -c-1 --cors -o",
+    "build": "npm install && echo 'Ready for deployment'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["portfolio", "3d", "threejs", "interactive"],
+  "author": "Ghost Rayu",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

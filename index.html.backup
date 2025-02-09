@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enhanced Solar System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; }
+        canvas { display: block; position: fixed; top: 0; left: 0; z-index: -1; }
+    </style>
+</head>
+<body>
+    <canvas id="bg"></canvas>
+
+    <div id="autobiography">
+        <h1>GHOST RAYU</h1>
+        <div class="bio">
+            <p><span>I'm an </span><span class="highlight">Artist</span><span>, </span><span class="highlight">Developer</span><span>, </span><span class="highlight">Engineer</span><span>, </span><span class="highlight">Entrepreneur</span><span>, </span><span class="highlight">Investor</span><span>, </span><span class="highlight">Photographer</span><span>, and </span><span class="highlight">Songwriter</span><span> combining creativity with precision.</span></p>
+            
+            <p><span>Skilled in </span><span class="highlight">CSS</span><span>, </span><span class="highlight">HTML</span><span>, </span><span class="highlight">JavaScript</span><span>, </span><span class="highlight">Python</span><span>, and </span><span class="highlight">Rust</span><span>, I manifest innovative solutions.</span></p>
+            
+            <p><span>I started </span><span class="highlight">Good Money Collective</span><span> to educate and expand horizons.</span></p>
+        </div>
+        <div class="social-links">
+            <a href="https://twitter.com/ghostrayu" target="_blank">TWITTER</a>
+            <a href="https://github.com/Ghostrayu" target="_blank">GITHUB</a>
+            <a href="https://www.flickr.com/photos/iranrayu/" target="_blank">FLICKR</a>
+            <a href="https://soundcloud.com/ghostrayu" target="_blank">SOUNDCLOUD</a>
+            <a href="https://tune.fm/@GhostRayu/music" target="_blank">TUNE.FM</a>
+            <a href="https://www.youtube.com/channel/UCXPxIHvf7T81Z_nr-W2fklQ" target="_blank">YOUTUBE</a>
+            <a href="https://www.goodmoneycollective.com" target="_blank" class="red-link">GMC.COM</a>
+            <a href="mailto:ghostrayu@protonmail.com" class="red-link">EMAIL</a>
+        </div>
+    </div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.156.1/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.156.1/examples/jsm/",
+            "three/examples/jsm/": "https://unpkg.com/three@0.156.1/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+        // Create scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+
+        // Create camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(50, 30, 50);
+
+        // Create renderer with better quality
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // Add orbit controls with constraints
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Distance constraints
+        controls.minDistance = 15; // Can't get too close to center
+        controls.maxDistance = 100; // Can't zoom out beyond solar system
+        
+        // Rotation constraints
+        controls.minPolarAngle = Math.PI * 0.1; // Limit how high user can go
+        controls.maxPolarAngle = Math.PI * 0.9; // Limit how low user can go
+        
+        // Make movement smoother
+        controls.enableZoom = true;
+        controls.zoomSpeed = 0.7;
+        controls.rotateSpeed = 0.7;
+        
+        // Prevent user from rolling the camera
+        controls.enableRotate = true;
+        controls.enablePan = false;
+        
+        controls.update();
+
+        // Add lights
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); // Increased intensity
+        scene.add(ambientLight);
+
+        // Add point light at sun position with higher intensity
+        const sunLight = new THREE.PointLight(0xffffff, 3, 1000); // Increased intensity and distance
+        scene.add(sunLight);
+
+        // Add hemisphere light for better overall illumination
+        const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+        scene.add(hemisphereLight);
+
+        // Create sun with enhanced glow
+        const sunGeometry = new THREE.SphereGeometry(5, 64, 64);
+        const sunMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xffff00,
+            emissive: 0xffff00,
+        });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+
+        // Add sun glow
+        const sunGlowGeometry = new THREE.SphereGeometry(5.5, 32, 32);
+        const sunGlowMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.BackSide
+        });
+        const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+        sun.add(sunGlow);
+        scene.add(sun);
+
+        // Function to create atmosphere
+        function createAtmosphere(radius, color) {
+            const geometry = new THREE.SphereGeometry(radius * 1.1, 32, 32);
+            const material = new THREE.MeshPhongMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.BackSide
+            });
+            return new THREE.Mesh(geometry, material);
+        }
+
+        // Create planets with enhanced materials
+        const planetData = [
+            { 
+                size: 0.4, 
+                color: 0xdddddd,  // Brighter Mercury
+                distance: 8,
+                emissive: 0x222222,
+                roughness: 0.4,   // Reduced roughness
+                metalness: 0.8,
+                bumpScale: 0.05,
+                detail: "Cratered surface with metallic sheen",
+                atmosphere: false
+            },
+            { 
+                size: 0.9, 
+                color: 0xFFA500, 
+                distance: 12,
+                emissive: 0x331100,
+                roughness: 0.5,   // Reduced roughness
+                metalness: 0.3,
+                bumpScale: 0.1,
+                detail: "Thick cloudy atmosphere",
+                atmosphere: { color: 0xFFA07A }
+            },
+            { 
+                size: 1.0, 
+                color: 0x4444ff,  // Brighter Earth
+                distance: 16,
+                emissive: 0x000066,
+                roughness: 0.3,   // Reduced roughness
+                metalness: 0.2,
+                bumpScale: 0.1,
+                detail: "Oceanic blue with cloud patterns",
+                atmosphere: { color: 0x87CEEB }
+            },
+            { 
+                size: 0.5, 
+                color: 0xFF4500,  // Brighter Mars
+                distance: 20,
+                emissive: 0x330000,
+                roughness: 0.6,   // Reduced roughness
+                metalness: 0.2,
+                bumpScale: 0.15,
+                detail: "Red rocky surface with polar caps",
+                atmosphere: { color: 0xFF6347 }
+            },
+            { 
+                size: 2.5, 
+                color: 0xFFB347,  // Brighter Jupiter
+                distance: 26,
+                emissive: 0x332211,
+                roughness: 0.4,   // Reduced roughness
+                metalness: 0.3,
+                bumpScale: 0.2,
+                detail: "Gas giant with swirling bands",
+                atmosphere: { color: 0xDEB887 }
+            },
+            { 
+                size: 2.0, 
+                color: 0xFFD700, 
+                distance: 32,
+                emissive: 0x332200,
+                roughness: 0.4,   // Reduced roughness
+                metalness: 0.4,
+                bumpScale: 0.15,
+                detail: "Golden bands with ring system",
+                atmosphere: { color: 0xDAA520 }
+            },
+            { 
+                size: 1.7, 
+                color: 0x00FFFF,  // Brighter Uranus
+                distance: 38,
+                emissive: 0x001111,
+                roughness: 0.3,   // Reduced roughness
+                metalness: 0.4,
+                bumpScale: 0.1,
+                detail: "Ice giant with subtle bands",
+                atmosphere: { color: 0x40E0D0 }
+            },
+            { 
+                size: 1.7, 
+                color: 0x1E90FF,  // Brighter Neptune
+                distance: 44,
+                emissive: 0x000066,
+                roughness: 0.3,   // Reduced roughness
+                metalness: 0.4,
+                bumpScale: 0.1,
+                detail: "Deep blue with storm systems",
+                atmosphere: { color: 0x4169E1 }
+            }
+        ];
+
+        const planets = planetData.map(data => {
+            // Create main planet geometry with more segments for smoothness
+            const geometry = new THREE.SphereGeometry(data.size, 64, 64);
+            
+            // Create detailed material with normal map for surface detail
+            const material = new THREE.MeshStandardMaterial({ 
+                color: data.color,
+                emissive: data.emissive,
+                emissiveIntensity: 0.5,  // Added emissive intensity
+                roughness: data.roughness,
+                metalness: data.metalness,
+                bumpScale: data.bumpScale,
+                normalScale: new THREE.Vector2(1, 1)
+            });
+
+            // Create the planet mesh
+            const planet = new THREE.Mesh(geometry, material);
+            planet.position.x = data.distance;
+
+            // Add glow effect to each planet
+            const glowGeometry = new THREE.SphereGeometry(data.size * 1.2, 32, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: data.color,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            planet.add(glow);
+
+            // Add bump patterns
+            const bumpGeometry = new THREE.SphereGeometry(data.size * 1.001, 32, 32);
+            const bumpMaterial = new THREE.MeshPhongMaterial({
+                color: data.color,
+                transparent: true,
+                opacity: 0.3,
+                wireframe: true
+            });
+            const bumpLayer = new THREE.Mesh(bumpGeometry, bumpMaterial);
+            planet.add(bumpLayer);
+
+            // Add atmosphere if specified
+            if (data.atmosphere) {
+                const atmosphere = createAtmosphere(data.size, data.atmosphere.color);
+                planet.add(atmosphere);
+            }
+
+            return planet;
+        });
+
+        planets.forEach(planet => scene.add(planet));
+
+        // Enhanced Saturn's rings
+        const ringGeometry = new THREE.RingGeometry(3, 5, 128);
+        const ringMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xFFD700,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.8,
+            roughness: 0.6,
+            metalness: 0.4
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        
+        // Add detail to rings
+        const innerRing = new THREE.RingGeometry(3.2, 4.8, 128);
+        const innerRingMaterial = new THREE.MeshStandardMaterial({
+            color: 0xFFA500,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.5
+        });
+        const innerRingMesh = new THREE.Mesh(innerRing, innerRingMaterial);
+        
+        ring.rotation.x = Math.PI / 2;
+        innerRingMesh.rotation.x = Math.PI / 2;
+        
+        planets[5].add(ring);
+        planets[5].add(innerRingMesh);
+
+        // Create stars
+        const starGeometry = new THREE.BufferGeometry();
+        const starMaterial = new THREE.PointsMaterial({
+            color: 0xFFFFFF,
+            size: 0.3,
+            transparent: true,
+            opacity: 0.9,
+            sizeAttenuation: true
+        });
+
+        const starVertices = [];
+        for (let i = 0; i < 5000; i++) {
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 200;
+            const z = (Math.random() - 0.5) * 200;
+            starVertices.push(x, y, z);
+        }
+
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+        // Add some larger, brighter stars
+        const brightStarGeometry = new THREE.BufferGeometry();
+        const brightStarMaterial = new THREE.PointsMaterial({
+            color: 0xFFFFFF,
+            size: 0.5,
+            transparent: true,
+            opacity: 1,
+            sizeAttenuation: true
+        });
+
+        const brightStarVertices = [];
+        for (let i = 0; i < 500; i++) {
+            const x = (Math.random() - 0.5) * 150;
+            const y = (Math.random() - 0.5) * 150;
+            const z = (Math.random() - 0.5) * 150;
+            brightStarVertices.push(x, y, z);
+        }
+
+        brightStarGeometry.setAttribute('position', new THREE.Float32BufferAttribute(brightStarVertices, 3));
+        const brightStars = new THREE.Points(brightStarGeometry, brightStarMaterial);
+        scene.add(brightStars);
+
+        // Add closest, brightest stars
+        const closestStarGeometry = new THREE.BufferGeometry();
+        const closestStarMaterial = new THREE.PointsMaterial({
+            color: 0xFFFFFF,
+            size: 0.8,
+            transparent: true,
+            opacity: 1,
+            sizeAttenuation: true
+        });
+
+        const closestStarVertices = [];
+        for (let i = 0; i < 100; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const y = (Math.random() - 0.5) * 100;
+            const z = (Math.random() - 0.5) * 100;
+            closestStarVertices.push(x, y, z);
+        }
+
+        closestStarGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closestStarVertices, 3));
+        const closestStars = new THREE.Points(closestStarGeometry, closestStarMaterial);
+        scene.add(closestStars);
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate planets with varying speeds and axes
+            planets.forEach((planet, index) => {
+                const speed = 0.001 / (index + 1);
+                const angle = Date.now() * speed;
+                const distance = planetData[index].distance;
+                
+                planet.position.x = Math.cos(angle) * distance;
+                planet.position.z = Math.sin(angle) * distance;
+                
+                // Add slight tilt and rotation variations
+                planet.rotation.y += 0.01;
+                planet.rotation.x = Math.PI / 12; // Slight tilt
+            });
+
+            // Rotate sun on its axis
+            sun.rotation.y += 0.002;
+            sunGlow.rotation.y -= 0.001;
+
+            // Slowly rotate stars for twinkling effect
+            stars.rotation.y += 0.0001;
+            brightStars.rotation.y -= 0.0001;
+            closestStars.rotation.y += 0.0002;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

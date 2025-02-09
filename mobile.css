@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Space Mono', monospace;
+    background: #000;
+    color: white;
+    overflow: hidden;
+    line-height: 1.6;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#autobiography {
+    position: fixed !important;
+    top: 45% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1.25rem;
+    border-radius: 10px;
+    width: 65vw;
+    max-width: 320px;
+    min-height: fit-content;
+    z-index: 1000;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: white;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    font-family: 'Space Mono', monospace;
+}
+
+h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    font-weight: 700;
+    color: #FFD700;
+    font-family: 'Space Mono', monospace;
+}
+
+.bio {
+    margin-bottom: 1rem;
+}
+
+.bio p {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    word-spacing: 0.05em;
+    color: white;
+}
+
+.bio p:last-child {
+    margin-bottom: 0;
+}
+
+.highlight {
+    color: #FFD700 !important;
+    font-weight: 700;
+}
+
+.social-links {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    justify-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.social-links a {
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.25rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.social-links a.red-link {
+    color: #FF3333;
+}
+
+.social-links a:hover {
+    color: white;
+}
+
+/* Landscape orientation */
+@media (orientation: landscape) {
+    #autobiography {
+        width: 55vw;
+        max-width: 400px;
+        height: 85vh;
+        overflow-y: auto;
+        padding: 1rem;
+        top: 50% !important;
+    }
+    
+    h1 {
+        margin-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .bio p {
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .social-links {
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        gap: 0.4rem;
+    }
+    
+    .social-links a {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.2rem;
+    }
+}
+
+/* Small phones */
+@media (max-height: 600px) {
+    #autobiography {
+        padding: 1rem;
+        top: 50% !important;
+        width: 60vw;
+        font-size: 0.85rem;
+    }
+    
+    h1 {
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .bio p {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .social-links {
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        gap: 0.4rem;
+    }
+    
+    .social-links a {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.2rem;
+    }
+}
+
+/* Extra small phones */
+@media (max-height: 480px) {
+    #autobiography {
+        padding: 0.75rem;
+        top: 50% !important;
+        width: 55vw;
+        font-size: 0.8rem;
+    }
+    
+    h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .bio p {
+        font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+        line-height: 1.3;
+    }
+    
+    .social-links {
+        margin-top: 0.5rem;
+        padding-top: 0.4rem;
+        gap: 0.3rem;
+    }
+    
+    .social-links a {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.15rem;
+    }
+}
