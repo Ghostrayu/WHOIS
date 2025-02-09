@@ -1,6 +1,6 @@
 body {
     margin: 0; 
-    font-family: 'Space Mono', monospace;
+    font-family: 'Times New Roman', Times, serif;
     color: white;
     overflow: hidden;
     background: #000;
@@ -150,8 +150,8 @@ canvas {
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     color: white;
-    font-size: 1rem;
-    line-height: 1.4;
+    font-size: 1.25rem;
+    line-height: 1.5;
     transition: opacity 0.3s ease;
     overflow-y: auto;
     opacity: 1;
@@ -201,12 +201,14 @@ canvas {
 }
 
 .bio p {
+    font-family: 'Times New Roman', Times, serif;
     margin-bottom: 0.8rem;
     color: white;
     font-size: 1rem;
 }
 
 h1 {
+    font-family: 'Times New Roman', Times, serif;
     font-size: 1.8rem;
     margin-bottom: 1rem;
     letter-spacing: 2px;
@@ -225,6 +227,7 @@ h1 {
 }
 
 .social-links a {
+    font-family: 'Times New Roman', Times, serif;
     color: #FFD700;
     text-decoration: none;
     font-size: 0.95rem;
@@ -489,6 +492,43 @@ h1 {
     .social-links a {
         font-size: 12px;
         padding: 4px 10px;
+    }
+}
+
+/* Mobile-specific highlight enhancements */
+@media (max-width: 768px) {
+    .highlight {
+        text-shadow: 0 0 15px rgba(255, 255, 0, 0.8),
+                     0 0 25px rgba(255, 255, 0, 0.6),
+                     0 0 35px rgba(255, 255, 0, 0.4);
+    }
+
+    .highlight-red {
+        text-shadow: 0 0 15px rgba(255, 0, 0, 0.8),
+                     0 0 25px rgba(255, 0, 0, 0.6),
+                     0 0 35px rgba(255, 0, 0, 0.4);
+    }
+
+    .highlight-green {
+        text-shadow: 0 0 15px rgba(0, 255, 0, 0.8),
+                     0 0 25px rgba(0, 255, 0, 0.6),
+                     0 0 35px rgba(0, 255, 0, 0.4);
+    }
+
+    .highlight-engineer {
+        text-shadow: 0 0 15px rgba(0, 128, 255, 0.8),
+                     0 0 25px rgba(0, 128, 255, 0.6),
+                     0 0 35px rgba(0, 128, 255, 0.4);
+    }
+
+    .highlight-css,
+    .highlight-html,
+    .highlight-javascript,
+    .highlight-python,
+    .highlight-rust {
+        text-shadow: 0 0 15px rgba(0, 128, 255, 0.8),
+                     0 0 25px rgba(0, 128, 255, 0.6),
+                     0 0 35px rgba(0, 128, 255, 0.4);
     }
 }
 
