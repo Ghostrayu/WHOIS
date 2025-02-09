@@ -350,13 +350,12 @@ export class SpaceScene {
         }
 
         // Update planet rotations
-        this.planets.forEach((planet, index) => {
-            const speed = 0.2 / (index + 1);
-            const radius = 20 + index * 15;
+        this.planets.forEach((planet) => {
+            const { orbitRadius, orbitSpeed, rotationSpeed } = planet.userData;
             
-            planet.position.x = Math.cos(time * speed) * radius;
-            planet.position.z = Math.sin(time * speed) * radius;
-            planet.rotation.y += 0.01 / (index + 1);
+            planet.position.x = Math.cos(time * orbitSpeed) * orbitRadius;
+            planet.position.z = Math.sin(time * orbitSpeed) * orbitRadius;
+            planet.rotation.y += rotationSpeed;
 
             if (planet.ring) {
                 planet.ring.position.copy(planet.position);
