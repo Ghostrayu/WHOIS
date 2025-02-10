@@ -86,6 +86,15 @@ h1 {
     font-weight: 700;
 }
 
+.highlight-pro-tools {
+    color: #ff00ff !important;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5),
+                 0 0 20px rgba(255, 0, 255, 0.3),
+                 0 0 10px rgba(0, 128, 255, 0.5),
+                 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
 .social-links {
     margin-top: 1rem;
     padding-top: 0.75rem;
