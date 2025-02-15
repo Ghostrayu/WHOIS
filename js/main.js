@@ -4,9 +4,15 @@ import { SpaceScene } from './scenes/spaceScene.js';
 import { EarthScene } from './scenes/earthScene.js';
 
 // Initialize renderer
+const canvas = document.getElementById('bg');
+if (!canvas) {
+    console.error('Could not find canvas element with id "bg"');
+    throw new Error('Canvas element not found');
+}
+
 const renderer = new THREE.WebGLRenderer({ 
     antialias: true,
-    canvas: document.getElementById('bg')
+    canvas: canvas
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);

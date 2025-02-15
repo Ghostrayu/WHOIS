@@ -1,19 +1,4 @@
-// Mobile menu functionality
+// Mobile-specific adjustments if needed
 document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.querySelector('.menu-button');
-    const autobiography = document.getElementById('autobiography');
-    let isHidden = false;
-
-    if (menuButton) {
-        menuButton.addEventListener('click', () => {
-            isHidden = !isHidden;
-            menuButton.classList.toggle('active');
-            
-            if (isHidden) {
-                autobiography.classList.add('hidden');
-            } else {
-                autobiography.classList.remove('hidden');
-            }
-        });
-    }
+    // Mobile optimization code can go here if needed in the future
 });
