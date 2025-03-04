@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle window resize
         window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
-            sceneManager.handleResize();
+            sceneManager.onWindowResize();
             
             // Show autobiography if window is resized to desktop size
             if (window.innerWidth > 768) {
