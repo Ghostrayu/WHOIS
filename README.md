@@ -111,11 +111,26 @@ An immersive 3D bio featuring two dynamic scenes: a serene countryside environme
 - Modern browsers with WebGL support
 - Responsive design for different screen sizes
 
+## Mobile Version
+A dedicated mobile version is available with:
+- Optimized layout for smaller screens
+- Responsive design for both portrait and landscape orientations
+- Touch-friendly interface
+- Same immersive 3D experience as desktop version
+
+## Social Links
+- GitHub: https://github.com/Ghostrayu
+- Flickr: https://www.flickr.com/photos/iranrayu/
+- SoundCloud: https://soundcloud.com/ghostrayu
+- Tune.FM: https://tune.fm/@GhostRayu/music
+- YouTube: https://www.youtube.com/channel/UCXPxIHvf7T81Z_nr-W2fklQ
+- GMC: https://www.goodmoneycollective.com
+
 ## Contributing
 Feel free to submit issues and enhancement requests.
 
 ## License
-OPEN SOURCE
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Credits
 WWW.GOODMONEYCOLLECTIVE.COM
